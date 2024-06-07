@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
+import cocktailsRouter from './routes/cocktails.js';
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -24,6 +25,7 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 // routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/cocktails',cocktailsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
