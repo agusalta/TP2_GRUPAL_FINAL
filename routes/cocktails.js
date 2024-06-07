@@ -1,5 +1,5 @@
 import express from 'express';
-import { searchCocktailByName, searchCocktailByFirstLetter, searchIngredientByName } from '../services/api.js';
+import * as apiService from '../services/api.js';
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.get('/:name', async (req, res, next) => {
     try {
         const name = req.params.name;
 
-        const cocktail = await searchCocktailByName(name);
+        const cocktail = await apiService.searchCocktailByName(name);
         res.status(200).json(cocktail);
 
     } catch (err) {
@@ -22,7 +22,7 @@ router.get('/letter/:letter', async (req, res, next) => {
     try {
         const letter = req.params.letter;
 
-        const cocktails = await searchCocktailByFirstLetter(letter);
+        const cocktails = await apiService.searchCocktailByFirstLetter(letter);
         res.status(200).json(cocktails);
 
     } catch (err) {
@@ -32,12 +32,11 @@ router.get('/letter/:letter', async (req, res, next) => {
 });
 
 // GET ingredient by name
-
 router.get('/ingredient/:name', async (req, res, next) => {
     try {
         const name = req.params.name;
 
-        const ingredient = await searchIngredientByName(name);
+        const ingredient = await apiService.searchIngredientByName(name);
         res.status(200).json(ingredient);
 
     } catch (err) {
@@ -45,6 +44,5 @@ router.get('/ingredient/:name', async (req, res, next) => {
         throw err;
     }
 });
-
 
 export default router;
