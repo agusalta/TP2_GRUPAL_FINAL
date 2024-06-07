@@ -128,7 +128,6 @@ export const getTypes = async () => {
     }
 }
 
-
 // Listar vasos de bebidas
 // URL = 'http://www.thecocktaildb.com/api/json/v1/1/list.php?g=list'
 export const getGlasses = async () => {
@@ -141,7 +140,6 @@ export const getGlasses = async () => {
         console.log(err.message);
     }
 }
-
 
 // Buscar bebidas por categoria
 // URL = 'https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=' // separar por guiones bajos (_)
