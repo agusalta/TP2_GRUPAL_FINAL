@@ -26,6 +26,7 @@ router.get('/letter/:letter', async (req, res, next) => {
         res.status(200).json(cocktails);
 
     } catch (err) {
+        res.status(500).send(err);
         console.error(err.message);
         throw err;
     }

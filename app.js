@@ -7,9 +7,16 @@ import logger from 'morgan';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import cocktailsRouter from './routes/cocktails.js';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 8081;
+
+app.use(cors({
+  origin: 'http://localhost:3001',
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: false,
+}));
 
 // view engine setup
 app.set('views', path.join(process.cwd(), 'views'));
