@@ -129,7 +129,7 @@ router.get('/cocktail/glasses', async (req, res) => {
 })
 
 // Buscar bebida POR categoria
-router.get('/search/:category', async (req, res) => {
+router.get('/category/search/:category', async (req, res) => {
     try {
         const category = req.params.category;
         const cocktails = await apiService.searchByCategory(category);
