@@ -2,15 +2,18 @@ import getConnection from "./conn.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const DATABASE = "TP2_tpFinal";
+const COLLECTION = "users";
+
 export async function addUser(user) {
   const clientMongo = await getConnection();
 
-  //validar si el usuario existe
+  // validar si el usuario existe
   user.password = await bcryptjs.hash(user.password, 10);
 
   const result = clientMongo
-    .db("TP2_tpFinal")
-    .collection("users")
+    .db(DATABASE)
+    .collection(COLLECTION)
     .insertOne(user);
 
   return result;
@@ -20,20 +23,109 @@ export async function findByCredential(email, password) {
   const clientMongo = await getConnection();
 
   const user = await clientMongo
-    .db("TP2_tpFinal")
-    .collection("users")
+    .db(DATABASE)
+    .collection(COLLECTION)
     .findOne({ email: email });
+
   if (!user) {
-    throw new Error("Credenciales Invalidas.");
+    throw new Error("No se ha encontrado ningun usuario con estas credenciales.");
   }
 
   const isMatch = await bcryptjs.compare(password, user.password);
 
   if (!isMatch) {
-    throw new Error("Credenciales Invalidas.");
+    throw new Error("Credenciales invalidas.");
   }
 
   return user;
+}
+
+export async function getAllUsers() {
+  const clientMongo = await getConnection();
+
+  const users = await clientMongo
+    .db(DATABASE)
+    .collection(COLLECTION)
+    .find()
+    .toArray();
+
+  return users;
+}
+
+export async function addFavoriteCocktail(email, strDrink) {
+  const clientMongo = await getConnection();
+
+  try {
+    const user = await clientMongo
+      .db(DATABASE)
+      .collection(COLLECTION)
+      .findOne({ email });
+
+    if (!user) {
+      throw new Error("No se ha encontrado ningún usuario con estas credenciales.");
+    }
+
+    await clientMongo.db(DATABASE).collection(COLLECTION).updateOne(
+      { email },
+      { $addToSet: { favoriteCocktails: strDrink } }
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Error", error);
+    throw new Error("Error", error.message);
+  } finally {
+    clientMongo.close();
+  }
+}
+
+export async function removeFavoriteCocktail(email, strDrink) {
+  const clientMongo = await getConnection();
+
+  try {
+    const user = await clientMongo
+      .db(DATABASE)
+      .collection(COLLECTION)
+      .findOne({ email });
+
+    if (!user) {
+      throw new Error("No se ha encontrado ningún usuario con estas credenciales.");
+    }
+
+    await clientMongo.db(DATABASE).collection(COLLECTION).updateOne(
+      { email },
+      { $pull: { favoriteCocktails: strDrink } }
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Error", error);
+    throw new Error("Error", error.message);
+  } finally {
+    clientMongo.close();
+  }
+}
+
+export async function getFavoriteCocktails(email) {
+  const clientMongo = await getConnection();
+
+  try {
+    const user = await clientMongo
+      .db(DATABASE)
+      .collection(COLLECTION)
+      .findOne({ email });
+
+    if (!user) {
+      throw new Error("No se ha encontrado ningún usuario con estas credenciales.");
+    }
+
+    return user.favoriteCocktails || [];
+  } catch (error) {
+    console.error("Error", error);
+    throw new Error("Error", error.message);
+  } finally {
+    clientMongo.close();
+  }
 }
 
 export async function generateAuthToken(user) {
