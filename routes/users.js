@@ -60,12 +60,14 @@ usersRouter.post("/:email/favorites", async (req, res) => {
 usersRouter.delete("/:email/favorites", async (req, res) => {
   try {
     const email = req.params.email;
-    const strDrink = req.params.strDrink;
+    const { strDrink } = req.body;
     const user = await removeFavoriteCocktail(email, strDrink);
     res.send(user);
   } catch (error) {
     res.status(500).send({ error: "An error occurred while deleting the user favorite drink.", error });
   }
 });
+
+
 
 export default usersRouter;
