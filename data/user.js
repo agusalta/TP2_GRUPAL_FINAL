@@ -8,15 +8,30 @@ const COLLECTION = "users";
 export async function addUser(user) {
   const clientMongo = await getConnection();
 
-  // validar si el usuario existe
-  user.password = await bcryptjs.hash(user.password, 10);
+  try {
+    // Validar si el usuario ya existe antes de insertar
+    const existingUser = await clientMongo
+      .db(DATABASE)
+      .collection(COLLECTION)
+      .findOne({ email: user.email });
 
-  const result = clientMongo
-    .db(DATABASE)
-    .collection(COLLECTION)
-    .insertOne(user);
+    if (existingUser) {
+      throw new Error("User with this email already exists.");
+    }
 
-  return result;
+    // Hashear la contraseña antes de insertar el usuario en la base de datos
+    user.password = await bcryptjs.hash(user.password, 10);
+
+    const result = await clientMongo
+      .db(DATABASE)
+      .collection(COLLECTION)
+      .insertOne(user);
+
+    return result;
+  } catch (error) {
+    console.error("Error adding user:", error);
+    throw new Error("Error adding user: " + error.message);
+  }
 }
 
 export async function findByCredential(email, password) {
@@ -74,8 +89,6 @@ export async function addFavoriteCocktail(email, strDrink) {
   } catch (error) {
     console.error("Error", error);
     throw new Error("Error", error.message);
-  } finally {
-    clientMongo.close();
   }
 }
 
@@ -101,8 +114,6 @@ export async function removeFavoriteCocktail(email, strDrink) {
   } catch (error) {
     console.error("Error", error);
     throw new Error("Error", error.message);
-  } finally {
-    clientMongo.close();
   }
 }
 
@@ -123,8 +134,6 @@ export async function getFavoriteCocktails(email) {
   } catch (error) {
     console.error("Error", error);
     throw new Error("Error", error.message);
-  } finally {
-    clientMongo.close();
   }
 }
 
