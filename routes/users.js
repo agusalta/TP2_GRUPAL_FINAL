@@ -36,7 +36,7 @@ usersRouter.get("/list", async (req, res) => {
   }
 });
 
-usersRouter.get("/:email/favorites/", async (req, res) => {
+usersRouter.get("/:email/favorites", async (req, res) => {
   try {
     const email = req.params.email;
     const user = await getFavoriteCocktails(email);
