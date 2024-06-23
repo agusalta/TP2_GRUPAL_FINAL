@@ -1,5 +1,5 @@
 import express from "express";
-import { addFavoriteCocktail, removeFavoriteCocktail, getFavoriteCocktails, addUser, findByCredential, generateAuthToken, getAllUsers } from "../data/user.js";
+import { addFavoriteCocktail, removeFavoriteCocktail, getFavoriteCocktails, addUser, findByCredential, generateAuthToken, getAllUsers, verifyToken, findByEmail } from "../data/user.js";
 
 const usersRouter = express.Router();
 
@@ -26,7 +26,7 @@ usersRouter.post("/login", async (req, res) => {
 });
 
 /* GET users listing. */
-usersRouter.get("/list", async (req, res) => {
+usersRouter.get("/list", verifyToken, async (req, res) => {
   try {
     const users = await getAllUsers();
     res.send(users);
@@ -36,7 +36,22 @@ usersRouter.get("/list", async (req, res) => {
   }
 });
 
-usersRouter.get("/:email/favorites", async (req, res) => {
+usersRouter.get("/find/:email", verifyToken, async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await findByEmail(email);
+    if (!user) {
+      res.status(404).send({ error: "User not found" });
+      return;
+    }
+    res.send(user);
+  } catch (error) {
+    console.error("Error finding user by email:", error);
+    res.status(500).send({ error: "An error occurred while finding the user by email, " + error.message });
+  }
+});
+
+usersRouter.get("/:email/favorites", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
     const user = await getFavoriteCocktails(email);
@@ -46,7 +61,7 @@ usersRouter.get("/:email/favorites", async (req, res) => {
   }
 });
 
-usersRouter.post("/:email/favorites", async (req, res) => {
+usersRouter.post("/:email/favorites", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
     const { strDrink } = req.body;
@@ -57,7 +72,7 @@ usersRouter.post("/:email/favorites", async (req, res) => {
   }
 });
 
-usersRouter.delete("/:email/favorites", async (req, res) => {
+usersRouter.delete("/:email/favorites", verifyToken, async (req, res) => {
   try {
     const email = req.params.email;
     const { strDrink } = req.body;
@@ -67,7 +82,6 @@ usersRouter.delete("/:email/favorites", async (req, res) => {
     res.status(500).send({ error: "An error occurred while deleting the user favorite drink.", error });
   }
 });
-
 
 
 export default usersRouter;

@@ -55,6 +55,21 @@ export async function findByCredential(email, password) {
   return user;
 }
 
+export async function findByEmail(email) {
+  const clientMongo = await getConnection();
+
+  const user = await clientMongo
+    .db(DATABASE)
+    .collection(COLLECTION)
+    .findOne({ email: email });
+
+  if (!user) {
+    throw new Error("No se ha encontrado ningun usuario con este correo.");
+  }
+
+  return user;
+}
+
 export async function getAllUsers() {
   const clientMongo = await getConnection();
 
@@ -145,3 +160,14 @@ export async function generateAuthToken(user) {
   );
   return token;
 }
+
+export function verifyToken(req, res, next) {
+  const bearerHeader = req.headers['authorization'];
+  if (typeof bearerHeader !== 'undefined') {
+    const bearerToken = bearerHeader.split(' ')[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.status(403).send('You need a permission token to access this resource.');
+  }
+};
