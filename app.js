@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'dotenv/config';
 import express from 'express';
 import createError from 'http-errors';
 import path from 'path';
@@ -12,11 +12,21 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8081;
 
-app.use(cors({
-  origin: '*',
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,POST,PUT,DELETE',
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 
 // view engine setup
 app.set('views', path.join(process.cwd(), 'views'));
