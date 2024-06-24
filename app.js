@@ -13,9 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 8081;
 
 app.use(cors({
-  origin: 'http://localhost:3001',
+  origin: '*',
   methods: 'GET,POST,PUT,DELETE',
-  credentials: false,
+  credentials: true,
 }));
 
 // view engine setup
